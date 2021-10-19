@@ -24,7 +24,6 @@ func NewSkillHandler(router *echo.Echo, skillUseCase domain.SkillUseCase) {
 	router.POST("/skill", handler.PostSkill)
 	router.GET("/skill/:id", handler.GetSkill)
 	router.GET("/skill", handler.GetAllSkills)
-	router.GET("/skill/:category", handler.GetSkillsByCategory)
 	router.DELETE("/skill/:id", handler.DeleteSkill)
 }
 
@@ -64,18 +63,6 @@ func (handler *SkillHandler) GetAllSkills(context echo.Context) error {
 	}
 
 	return context.JSON(http.StatusOK, skillDomainList)
-}
-
-func (handler *SkillHandler) GetSkillsByCategory(context echo.Context) error {
-	category := context.Param("category")
-
-	skillDomain, err := handler.skillUseCase.ListSkillsByCategory(category)
-
-	if err != nil {
-		return err
-	}
-
-	return context.JSON(http.StatusOK, skillDomain)
 }
 
 func (handler *SkillHandler) DeleteSkill(context echo.Context) error {

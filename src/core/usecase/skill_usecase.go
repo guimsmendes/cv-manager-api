@@ -30,10 +30,6 @@ func (s *SkillUseCase) ListSkills() ([]domain.SkillDomain, error) {
 	panic("implement me")
 }
 
-func (s *SkillUseCase) ListSkillsByCategory(c string) ([]domain.SkillDomain, error) {
-	panic("implement me")
-}
-
 func NewSkillUseCase(repository gateway.CVRepository) domain.SkillUseCase {
 	return &SkillUseCase {
 		cvRepository: repository,

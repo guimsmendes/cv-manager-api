@@ -11,7 +11,7 @@ type ExperienceDomain struct {
 	Category string `bson:"category" json:"category" validate:"required"`
 	Company string `bson:"company" json:"company" validate:"required"`
 	Location string `bson:"location" json:"location" validate:"required"`
-	Skills []bson.ObjectId `bson:"skills" json:"skills" validate:"required"`
+	Skills []SkillDomain `bson:"skills" json:"skills" validate:"required"`
 	Description string `bson:"description" json:"description" validate:"required"`
 	StartDate time.Time `bson:"startDate" json:"startDate" validate:"required"`
 	EndDate time.Time `bson:"endDate" json:"endDate"`
@@ -20,9 +20,9 @@ type ExperienceDomain struct {
 
 type ExperienceUseCase interface {
 	AddExperience(domain ExperienceDomain) error
-	RemoveSkill(id bson.ObjectId) error
-	AddSkill(id bson.ObjectId) error
+	RemoveSkill(id bson.ObjectId, skillId bson.ObjectId) (ExperienceDomain, error)
+	AddSkill(id bson.ObjectId, skillId bson.ObjectId)  (ExperienceDomain, error)
 	SetEndDate(time time.Time) error
 	ListExperiences() ([]ExperienceDomain, error)
-	ListExperiencesByCategory(c string) ([]ExperienceDomain, error)
+	ListExperiencesByKeyword(keyword string) ([]ExperienceDomain, error)
 }

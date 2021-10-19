@@ -22,8 +22,6 @@ func NewExperienceHandler(router *echo.Echo, experienceUseCase domain.Experience
 	router.PATCH("/experience/:endDate", handler.PatchEndDate)
 	router.GET("/experience/:keyword", handler.GetExperiencesByKeyword)
 	router.GET("/experience", handler.GetAllExperiences)
-	router.GET("/experience/:category", handler.GetExperiencesByCategory)
-	router.GET("/experience/skill/:id", handler.GetExperiencesBySkillId)
 	router.DELETE("/experience/:id/skill/:skillId", handler.DeleteSkill)
 }
 
@@ -43,20 +41,20 @@ func (handler *ExperienceHandler) PostExperience(context echo.Context) error {
 	return context.JSON(http.StatusCreated, experienceDomain)
 }
 
-func (handler *ExperienceHandler) GetSkill(context echo.Context) error {
+func (handler *ExperienceHandler) PostSkill(context echo.Context) error {
 	id := context.Param("id")
+	skillId := context.Param("skillId")
 
-	skillDomain, err := handler.skillUseCase.GetSkill(bson.ObjectId(id))
-
+	experienceDomain, err := handler.experienceUseCase.AddSkill(bson.ObjectId(id), bson.ObjectId(skillId))
 	if err != nil {
 		return err
 	}
 
-	return context.JSON(http.StatusOK, skillDomain)
+	return context.JSON(http.StatusAccepted, experienceDomain)
 }
 
-func (handler *ExperienceHandler) GetAllSkills(context echo.Context) error {
-	skillDomainList, err := handler.skillUseCase.ListSkills()
+func (handler *ExperienceHandler) GetAllExperiences(context echo.Context) error {
+	skillDomainList, err := handler.experienceUseCase.ListExperiences()
 
 	if err != nil {
 		return err
@@ -65,26 +63,28 @@ func (handler *ExperienceHandler) GetAllSkills(context echo.Context) error {
 	return context.JSON(http.StatusOK, skillDomainList)
 }
 
-func (handler *ExperienceHandler) GetSkillsByCategory(context echo.Context) error {
-	category := context.Param("category")
+func (handler *ExperienceHandler) GetExperiencesByKeyword(context echo.Context) error {
+	keyword := context.Param("keyword")
 
-	skillDomain, err := handler.skillUseCase.ListSkillsByCategory(category)
+	skillDomainList, err := handler.experienceUseCase.ListExperiencesByKeyword(keyword)
 
 	if err != nil {
 		return err
 	}
 
-	return context.JSON(http.StatusOK, skillDomain)
+	return context.JSON(http.StatusOK, skillDomainList)
 }
 
 func (handler *ExperienceHandler) DeleteSkill(context echo.Context) error {
 	id := context.Param("id")
+	skillId := context.Param("skillId")
 
-	err := handler.skillUseCase.RemoveSkill(bson.ObjectId(id))
+	experienceDomain, err := handler.experienceUseCase.RemoveSkill(bson.ObjectId(id), bson.ObjectId(skillId))
 
 	if err != nil {
 		return err
 	}
 
-	return context.JSON(http.StatusOK, deleted)
+	experienceDomain
+	return context.JSON(http.StatusOK, experienceDomain)
 }

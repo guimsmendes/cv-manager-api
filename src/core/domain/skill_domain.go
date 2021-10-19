@@ -16,8 +16,6 @@ type SkillUseCase interface {
 	RemoveSkill(id bson.ObjectId) error
 	GetSkill(id bson.ObjectId) (SkillDomain, error)
 	ListSkills() ([]SkillDomain, error)
-	ListSkillsByCategory(c string) ([]SkillDomain,error)
-	ListSkillsWithBadge(badge bool) ([]SkillDomain, error)
 }
 
 
