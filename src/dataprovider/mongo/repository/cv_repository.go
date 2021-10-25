@@ -14,18 +14,18 @@ func (s *CVRepository) DbInsert(collection string, insert interface{}) error {
 	return err
 }
 
-func (s *CVRepository) DbFindOne(collection string, findBson bson.M, selectBson bson.M) (map[string]interface{}, error) {
+func (s *CVRepository) DbFindOne(collection string, findBson bson.M) (bson.M, error) {
 	c := s.C(collection)
-	getMap := make(map[string]interface{})
-	err := c.Find(findBson).Select(selectBson).One(&getMap)
-	return getMap, err
+	var doc bson.M
+	err := c.Find(findBson).One(&doc)
+	return doc, err
 }
 
-func (s *CVRepository) DbFindAll(collection string, findBson bson.M, selectBson bson.M) (map[string]interface{}, error) {
+func (s *CVRepository) DbFindAll(collection string, findBson bson.M) ([]bson.M, error) {
 	c := s.C(collection)
-	getMap := make(map[string]interface{})
-	err := c.Find(findBson).Select(selectBson).All(&getMap)
-	return getMap, err
+	var docList []bson.M
+	err := c.Find(findBson).All(&docList)
+	return docList, err
 }
 
 func (s *CVRepository) DbUpdate(collection string, selector bson.M, update bson.M) error {
@@ -38,13 +38,12 @@ func (s *CVRepository) DbUpdate(collection string, selector bson.M, update bson.
 	return updateError
 }
 
-func (s *CVRepository) DbRemoveOne(collection string, selector bson.M) error {
+func (s *CVRepository) DbRemoveOne(collection string, findBson bson.M) error {
 	c := s.C(collection)
-	removeError := c.Remove(selector)
-	return removeError
+	return c.Remove(findBson)
 }
 
-func toDoc(v interface{}) (doc *bson.DocElem) {
+func toDoc(v interface{}) (doc *bson.M) {
 	data, err := bson.Marshal(v)
 	if err != nil {
 		return

@@ -13,21 +13,38 @@ type SkillUseCase struct {
 }
 
 func (s *SkillUseCase) AddSkill(domain domain.SkillDomain) error {
-	err := s.cvRepository.DbInsert(COLLECTION, domain)
-	return err
+	return s.cvRepository.DbInsert(COLLECTION, domain)
 }
 
-
-func (s *SkillUseCase) RemoveSkill(id bson.ObjectId) error {
-	panic("implement me")
+func (s *SkillUseCase) RemoveSkill(id string) error {
+	return s.cvRepository.DbRemoveOne(COLLECTION, bson.M{"_id": bson.ObjectIdHex(id)})
 }
 
-func (s *SkillUseCase) GetSkill(id bson.ObjectId) (domain.SkillDomain, error) {
-	panic("implement me")
+func (s *SkillUseCase) GetSkill(id string) (*domain.SkillDomain, error) {
+	doc, err := s.cvRepository.DbFindOne(COLLECTION, bson.M{"_id": bson.ObjectIdHex(id)})
+	return s.toSkillDomain(doc), err
 }
 
-func (s *SkillUseCase) ListSkills() ([]domain.SkillDomain, error) {
-	panic("implement me")
+func (s *SkillUseCase) ListSkills() ([]*domain.SkillDomain, error) {
+	docList, err := s.cvRepository.DbFindAll(COLLECTION, bson.M{})
+	var skillDomainList []*domain.SkillDomain
+	for _, doc := range docList {
+		skill := s.toSkillDomain(doc)
+		skillDomainList = append(skillDomainList, skill)
+	}
+	return skillDomainList, err
+}
+
+func (s *SkillUseCase) toSkillDomain(doc bson.M) (domain *domain.SkillDomain) {
+	bsonBytes, err := bson.Marshal(doc)
+	if err != nil {
+		return
+	}
+	err = bson.Unmarshal(bsonBytes, &domain)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func NewSkillUseCase(repository gateway.CVRepository) domain.SkillUseCase {

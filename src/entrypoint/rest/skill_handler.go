@@ -3,6 +3,7 @@ package rest
 import (
 	"cv-manager-api/src/core/domain"
 	"cv-manager-api/src/entrypoint/util"
+	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
@@ -21,6 +22,9 @@ func NewSkillHandler(router *echo.Echo, skillUseCase domain.SkillUseCase) {
 		skillUseCase: skillUseCase,
 	}
 
+	router.Validator = &util.CustomValidator{
+		Validator: validator.New()}
+
 	router.POST("/skill", handler.PostSkill)
 	router.GET("/skill/:id", handler.GetSkill)
 	router.GET("/skill", handler.GetAllSkills)
@@ -35,7 +39,6 @@ func (handler *SkillHandler) PostSkill(context echo.Context) error {
 	}
 
 	skillDomain.ID = bson.NewObjectId()
-
 	if err := handler.skillUseCase.AddSkill(*skillDomain); err != nil {
 		return err
 	}
@@ -45,8 +48,7 @@ func (handler *SkillHandler) PostSkill(context echo.Context) error {
 
 func (handler *SkillHandler) GetSkill(context echo.Context) error {
 	id := context.Param("id")
-
-	skillDomain, err := handler.skillUseCase.GetSkill(bson.ObjectId(id))
+	skillDomain, err := handler.skillUseCase.GetSkill(id)
 
 	if err != nil {
 		return err
@@ -68,7 +70,7 @@ func (handler *SkillHandler) GetAllSkills(context echo.Context) error {
 func (handler *SkillHandler) DeleteSkill(context echo.Context) error {
 	id := context.Param("id")
 
-	err := handler.skillUseCase.RemoveSkill(bson.ObjectId(id))
+	err := handler.skillUseCase.RemoveSkill(id)
 
 	if err != nil {
 		return err

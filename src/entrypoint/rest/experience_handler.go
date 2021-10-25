@@ -20,8 +20,8 @@ func NewExperienceHandler(router *echo.Echo, experienceUseCase domain.Experience
 	router.POST("/experience", handler.PostExperience)
 	router.POST("/experience/:id/skill/:skillId", handler.PostSkill)
 	router.PATCH("/experience/:endDate", handler.PatchEndDate)
-	router.GET("/experience/:keyword", handler.GetExperiencesByKeyword)
 	router.GET("/experience", handler.GetAllExperiences)
+	router.GET("/experience/:keyword", handler.GetExperiencesByKeyword)
 	router.DELETE("/experience/:id/skill/:skillId", handler.DeleteSkill)
 }
 
@@ -32,7 +32,7 @@ func (handler *ExperienceHandler) PostExperience(context echo.Context) error {
 		return err
 	}
 
-	experienceDomain.ID = bson.NewObjectId()
+	experienceDomain.ID = bson.NewObjectId().String()
 
 	if err := handler.experienceUseCase.AddExperience(*experienceDomain); err != nil {
 		return err
@@ -51,6 +51,17 @@ func (handler *ExperienceHandler) PostSkill(context echo.Context) error {
 	}
 
 	return context.JSON(http.StatusAccepted, experienceDomain)
+}
+
+func (handler *ExperienceHandler) PatchEndDate(context echo.Context) error {
+	endDate := context.Param("endDate")
+
+	err := handler.experienceUseCase.SetEndDate(endDate)
+	if err != nil {
+		return err
+	}
+
+	return context.JSON(http.StatusAccepted, "")
 }
 
 func (handler *ExperienceHandler) GetAllExperiences(context echo.Context) error {
@@ -85,6 +96,5 @@ func (handler *ExperienceHandler) DeleteSkill(context echo.Context) error {
 		return err
 	}
 
-	experienceDomain
 	return context.JSON(http.StatusOK, experienceDomain)
 }
